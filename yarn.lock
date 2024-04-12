@@ -337,6 +337,7 @@ __metadata:
     helmet: "npm:^7.1.0"
     mongoose: "npm:^8.3.1"
     nodemon: "npm:^3.1.0"
+    validator: "npm:^13.11.0"
   languageName: unknown
   linkType: soft
 
@@ -1803,6 +1804,13 @@ __metadata:
   version: 1.0.1
   resolution: "utils-merge@npm:1.0.1"
   checksum: 10c0/02ba649de1b7ca8854bfe20a82f1dfbdda3fb57a22ab4a8972a63a34553cf7aa51bc9081cf7e001b035b88186d23689d69e71b510e610a09a4c66f68aa95b672
+  languageName: node
+  linkType: hard
+
+"validator@npm:^13.11.0":
+  version: 13.11.0
+  resolution: "validator@npm:13.11.0"
+  checksum: 10c0/0107da3add5a4ebc6391dac103c55f6d8ed055bbcc29a4c9cbf89eacfc39ba102a5618c470bdc33c6487d30847771a892134a8c791f06ef0962dd4b7a60ae0f5
   languageName: node
   linkType: hard
 
