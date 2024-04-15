@@ -23,8 +23,8 @@ const contactSchema = new mongoose.Schema({
   },
   phoneNumber: {
     type: String,
-    minLength: 10,
-    maxLength: 10,
+    minLength: [10, 'phoneNumber must be ten digits long'],
+    maxLength: [10, 'phoneNumber must be ten digits long'],
     validate: {
       validator: (value) => validator.isNumeric(value, { no_symbols: true }),
       message: ({ value }) => `${value} is not a valid phone number`
@@ -33,4 +33,4 @@ const contactSchema = new mongoose.Schema({
   company: String,
 });
 
-export const Contact = mongoose.Model('Contact', contactSchema);
+export const Contact = mongoose.model('Contact', contactSchema);
