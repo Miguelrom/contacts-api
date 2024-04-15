@@ -1,10 +1,11 @@
 import express from 'express';
+import { createContact } from '../controllers/contactsController.js';
 
 export const contactRouter = express.Router();
 
 contactRouter.route('/')
   .get((req, res) => res.json({message: "Get all contacts..."}))
-  .post((req, res) => res.json({message: "Create one contact..."}))
+  .post(createContact)
   
 contactRouter.route('/:contactId')
   .get((req, res) => res.json({message: `Get one contact with id: ${req.params.contactId}`}))
