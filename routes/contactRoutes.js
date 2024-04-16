@@ -1,10 +1,10 @@
 import express from 'express';
-import { createContact } from '../controllers/contactsController.js';
+import { createContact, getContacts } from '../controllers/contactsController.js';
 
 export const contactRouter = express.Router();
 
 contactRouter.route('/')
-  .get((req, res) => res.json({message: "Get all contacts..."}))
+  .get(getContacts)
   .post(createContact)
   
 contactRouter.route('/:contactId')

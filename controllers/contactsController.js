@@ -91,3 +91,83 @@ export const createContact = async (req, res) => {
 
   }
 }
+
+
+export const getContacts = async (req, res) => {
+
+  let { limit, offset } = req.query;
+
+  if (
+    limit &&
+    validator.isNumeric(limit, { no_symbols: true }) &&
+    parseInt(limit) >= 0
+  ) {
+    limit = parseInt(limit);
+  } else {
+    limit = 10;
+  }
+
+  if (
+    offset &&
+    validator.isNumeric(offset, { no_symbols: true }) &&
+    parseInt(offset) >= 0
+  ) {
+    offset = parseInt(offset);
+  } else {
+    offset = 0;
+  }
+
+
+  const options = {
+    limit,
+    skip: offset,
+  }
+
+  try {
+    
+    const results = await Contact.find({}, {}, options)
+      .sort({ lastName: 1 })
+      .exec();
+
+    const totalRecords = await Contact.find().count();
+
+    let previousLink = null;
+
+    if (offset - limit >= 0) {
+      previousLink = new URL(
+        `${req.baseUrl}?limit=${limit}&offset=${offset - limit}`,
+        process.env.ORIGIN_URL
+      );
+    }
+
+    let nextLink = null;
+
+    if (offset + limit < totalRecords) {
+      nextLink = new URL(
+        `${req.baseUrl}?limit=${limit}&offset=${offset + limit}`,
+        process.env.ORIGIN_URL
+      );
+    }
+
+    return res.status(200).json({
+      totalRecords,
+      previousLink,
+      nextLink,
+      results,
+    });
+
+  } catch (error) {
+
+    console.log('Error in getContacts():', error)
+    
+    return res
+      .status(500)
+      .json({
+        message: `Could not get contacts: ${
+          error._message ? error._message : "server error"
+        }`,
+      });
+
+  }
+
+}
