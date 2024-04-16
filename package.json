@@ -3,7 +3,7 @@
   "packageManager": "yarn@4.1.1",
   "type": "module",
   "scripts": {
-    "start": "yarn node ./server.js",
+    "start": "node ./server.js",
     "dev": "nodemon ./server.js"
   },
   "dependencies": {
