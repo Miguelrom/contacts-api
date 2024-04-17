@@ -363,3 +363,46 @@ export const updateContact = async (req, res) => {
   return res.status(200).json(contact);
 
 } // End updateContact()
+
+
+export const deleteContact = async (req, res) => {
+
+  const id = req.params.contactId;
+
+  if (!validator.isMongoId(id)) {
+    return res.status(400).json({
+      message: "Invalid contact identifier",
+      errors: [
+        {
+          message: "Route parameter is not a MongoDB ObjectId",
+          parameter: "contactId",
+        },
+      ],
+    });
+  }
+
+  try {
+    
+    const contact = await Contact.findById(id).exec();
+
+    if (contact) {
+      await contact.deleteOne();
+    }
+
+    return res.status(204).json();
+
+  } catch (error) {
+
+    console.log(error);
+    
+    return res
+      .status(500)
+      .json({
+        message: `Could not delete contact: ${
+          error._message ? error._message : "server error"
+        }`,
+      });
+    
+  }
+
+} // End deleteContact()

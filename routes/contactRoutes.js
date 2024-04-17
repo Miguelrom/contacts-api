@@ -4,6 +4,7 @@ import {
   getContacts,
   getOneContact,
   updateContact,
+  deleteContact,
 } from "../controllers/contactsController.js";
 
 export const contactRouter = express.Router();
@@ -15,5 +16,5 @@ contactRouter.route('/')
 contactRouter.route('/:contactId')
   .get(getOneContact)
   .put(updateContact)
-  .delete((req, res) => res.json({message: `Delete one contact with id: ${req.params.contactId}`}))
+  .delete(deleteContact)
 
