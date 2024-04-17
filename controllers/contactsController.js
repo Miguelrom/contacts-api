@@ -4,7 +4,15 @@ import validator from "validator";
 
 export const createContact = async (req, res) => {
 
-  const { name, lastName, email, phoneNumber, company } = req.body;
+  const body = req.body;
+
+  for (const key in body) {
+    if (typeof body[key] === "string") {
+      body[key] = validator.trim(body[key]);
+    }
+  }
+
+  const { name, lastName, email, phoneNumber, company } = body;
 
   const errorResponse = {
     message: 'Incorrect fields validation error',
@@ -77,7 +85,7 @@ export const createContact = async (req, res) => {
 
     return res
       .status(201)
-      .json({ message: "Contact created", contact: contact });
+      .json(contact);
 
   } catch (error) {
 
@@ -261,7 +269,15 @@ export const updateContact = async (req, res) => {
     });
   }
 
-  const { name, lastName, email, phoneNumber, company } = req.body;
+  const body = req.body;
+
+  for (const key in body) {
+    if (typeof body[key] === "string") {
+      body[key] = validator.trim(body[key]);
+    }
+  }
+
+  const { name, lastName, email, phoneNumber, company } = body;
 
   const errorResponse = {
     message: 'Incorrect fields validation error',
