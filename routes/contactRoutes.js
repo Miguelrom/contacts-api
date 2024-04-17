@@ -3,6 +3,7 @@ import {
   createContact,
   getContacts,
   getOneContact,
+  updateContact,
 } from "../controllers/contactsController.js";
 
 export const contactRouter = express.Router();
@@ -13,6 +14,6 @@ contactRouter.route('/')
   
 contactRouter.route('/:contactId')
   .get(getOneContact)
-  .put((req, res) => res.json({message: `Update one contact with id: ${req.params.contactId}`}))
+  .put(updateContact)
   .delete((req, res) => res.json({message: `Delete one contact with id: ${req.params.contactId}`}))
 

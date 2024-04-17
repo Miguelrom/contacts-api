@@ -54,7 +54,7 @@ export const createContact = async (req, res) => {
     phoneNumber.length !== 10
   ) {
     errorResponse.errors.push({
-      message: "Invalid phone number: it must be comprised of ten digits",
+      message: "Invalid phone number: it must be a string of ten digits",
       field: "phoneNumber",
     });
   }
@@ -217,3 +217,133 @@ export const getOneContact = async (req, res) => {
   }  
 
 }
+
+export const updateContact = async (req, res) => {
+
+  const id = req.params.contactId;
+
+  if (!validator.isMongoId(id)) {
+    return res.status(400).json({
+      message: "Invalid contact identifier",
+      errors: [
+        {
+          message: "Route parameter is not a MongoDB ObjectId",
+          parameter: "contactId",
+        },
+      ],
+    });
+  }
+  
+
+  let contact;
+
+  try {
+    
+    contact = await Contact.findById(id).exec();
+
+  } catch (error) {
+    
+    console.log('Error in updateContact()', error);
+
+    return res
+      .status(500)
+      .json({
+        message: `Could not update contact: ${
+          error._message ? error._message : "server error"
+        }`,
+      });
+
+  }
+
+  if (!contact) {
+    return res.status(404).json({
+      message: "Contact not found",
+    });
+  }
+
+  const { name, lastName, email, phoneNumber, company } = req.body;
+
+  const errorResponse = {
+    message: 'Incorrect fields validation error',
+    errors: []
+  };
+
+  if (name) {
+    contact.name = name;
+  }
+
+  if (lastName) {
+    contact.lastName = lastName;
+  }
+
+  if (email) {
+
+    if (validator.isEmail(email)) {
+
+      if (contact.email !== email) {
+
+        if (await Contact.findOne({ email }, 'name').lean()) {
+          errorResponse.errors.push({
+            message: 'Email already registered',
+            field: 'email',
+          });     
+        } else {
+          contact.email = email;
+        }
+
+      }
+
+    } else {
+      errorResponse.errors.push({
+        message: 'Invalid email',
+        field: 'email',
+      });
+    }
+
+  }
+
+  if (phoneNumber) {
+
+    if (
+      validator.isNumeric(phoneNumber, { no_symbols: true }) &&
+      phoneNumber.length === 10
+    ) {
+      contact.phoneNumber = phoneNumber;
+    } else {
+      errorResponse.errors.push({
+        message: "Invalid phone number: it must be a string of ten digits",
+        field: "phoneNumber",
+      });
+    }
+  }
+
+  if (company) {
+    contact.company = company;
+  }
+ 
+
+  if (errorResponse.errors.length > 0) {
+    return res.status(400).json(errorResponse);
+  }
+
+  try {
+    
+    await contact.save();
+
+  } catch (error) {
+
+    console.log(error);
+    
+    return res
+      .status(500)
+      .json({
+        message: `Could not update contact: ${
+          error._message ? error._message : "server error"
+        }`,
+      });
+
+  }
+
+  return res.status(200).json(contact);
+
+} // End updateContact()
