@@ -13,6 +13,18 @@ app.use(express.json());
 
 app.use('/contacts', contactRouter);
 
+app.all('*', (req, res) => {
+
+  res.status(404)
+
+  if (req.accepts('json')) {
+    res.json({ message: 'Route not found'});
+  } else {
+    res.type('text').send('Route not found');
+  }
+  
+});
+
 const PORT = process.env.PORT || 3001;
 
 mongoose.connection.on("open", () => {
