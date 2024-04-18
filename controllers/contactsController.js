@@ -103,7 +103,7 @@ export const createContact = async (req, res) => {
 
 export const getContacts = async (req, res) => {
 
-  let { limit, offset } = req.query;
+  let { limit, offset, search_query } = req.query;
 
   if (
     limit &&
@@ -131,19 +131,35 @@ export const getContacts = async (req, res) => {
     skip: offset,
   }
 
+  let filter = {};
+
+  if (search_query) {
+    const searchRegex = new RegExp(search_query, 'i');
+
+    filter = {
+      $or: [
+        { name: searchRegex },
+        { lastName: searchRegex },
+        { company: searchRegex },
+      ],
+    };
+    
+  }
+
   try {
     
-    const results = await Contact.find({}, {}, options)
+    const results = await Contact.find(filter, {}, options)
       .sort({ lastName: 1 })
       .exec();
 
-    const totalRecords = await Contact.find().count();
+    const totalRecords = await Contact.find(filter).count();
 
     let previousLink = null;
 
     if (offset - limit >= 0) {
       previousLink = new URL(
-        `${req.baseUrl}?limit=${limit}&offset=${offset - limit}`,
+        `${req.baseUrl}?limit=${limit}&offset=${offset - limit}${
+          search_query && `&search_query=${search_query}`}`,
         process.env.ORIGIN_URL
       );
     }
@@ -152,7 +168,8 @@ export const getContacts = async (req, res) => {
 
     if (offset + limit < totalRecords) {
       nextLink = new URL(
-        `${req.baseUrl}?limit=${limit}&offset=${offset + limit}`,
+        `${req.baseUrl}?limit=${limit}&offset=${offset + limit}${
+          search_query && `&search_query=${search_query}`}`,
         process.env.ORIGIN_URL
       );
     }
