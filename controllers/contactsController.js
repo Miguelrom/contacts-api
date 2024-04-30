@@ -159,7 +159,7 @@ export const getContacts = async (req, res) => {
     if (offset - limit >= 0) {
       previousLink = new URL(
         `${req.baseUrl}?limit=${limit}&offset=${offset - limit}${
-          search_query && `&search_query=${search_query}`}`,
+          search_query ? `&search_query=${search_query}` : ''}`,
         process.env.ORIGIN_URL
       );
     }
@@ -169,7 +169,7 @@ export const getContacts = async (req, res) => {
     if (offset + limit < totalRecords) {
       nextLink = new URL(
         `${req.baseUrl}?limit=${limit}&offset=${offset + limit}${
-          search_query && `&search_query=${search_query}`}`,
+          search_query ? `&search_query=${search_query}` : ''}`,
         process.env.ORIGIN_URL
       );
     }
