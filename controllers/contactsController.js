@@ -1,4 +1,4 @@
-import { Contact } from "../models/contact.js";
+import { Contact, validPhoneNumberRegex } from "../models/contact.js";
 import validator from "validator";
 
 
@@ -37,34 +37,25 @@ export const createContact = async (req, res) => {
 
   }
 
-  if (email) {
+  if (email && !validator.isEmail(email)) {
 
-    if (!validator.isEmail(email)) {
-
-      errorResponse.errors.push({
-        message: 'Invalid email',
-        field: 'email',
-      });
-
-    } else if (await Contact.findOne({ email }, 'name').lean()) {
-
-      errorResponse.errors.push({
-        message: 'Email already registered',
-        field: 'email',
-      });      
-
-    }
+    errorResponse.errors.push({
+      message: 'Invalid email',
+      field: 'email',
+    });
 
   }
 
-  if (
-    (phoneNumber && !validator.isNumeric(phoneNumber, { no_symbols: true })) ||
-    phoneNumber.length !== 10
-  ) {
-    errorResponse.errors.push({
-      message: "Invalid phone number: it must be a string of ten digits",
-      field: "phoneNumber",
-    });
+  if (phoneNumber && phoneNumber !== '') {
+
+    if (!validator.isNumeric(phoneNumber, { no_symbols: true }) || phoneNumber.length !== 10) {
+
+      errorResponse.errors.push({
+        message: "Invalid phone number: it must be a string of ten digits",
+        field: "phoneNumber",
+      });
+
+    }
   }
 
   if (errorResponse.errors.length > 0) {
@@ -88,6 +79,8 @@ export const createContact = async (req, res) => {
       .json(contact);
 
   } catch (error) {
+
+    console.log('Error in createContact', error)
 
     return res
       .status(500)
@@ -313,34 +306,23 @@ export const updateContact = async (req, res) => {
 
     if (validator.isEmail(email)) {
 
-      if (contact.email !== email) {
-
-        if (await Contact.findOne({ email }, 'name').lean()) {
-          errorResponse.errors.push({
-            message: 'Email already registered',
-            field: 'email',
-          });     
-        } else {
-          contact.email = email;
-        }
-
-      }
+      contact.email = email;
 
     } else {
+
       errorResponse.errors.push({
         message: 'Invalid email',
         field: 'email',
       });
+
     }
 
   }
 
+
   if (phoneNumber) {
 
-    if (
-      validator.isNumeric(phoneNumber, { no_symbols: true }) &&
-      phoneNumber.length === 10
-    ) {
+    if (validPhoneNumberRegex.test(phoneNumber)) {
       contact.phoneNumber = phoneNumber;
     } else {
       errorResponse.errors.push({
@@ -348,6 +330,7 @@ export const updateContact = async (req, res) => {
         field: "phoneNumber",
       });
     }
+
   }
 
   if (company) {

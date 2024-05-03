@@ -1,6 +1,10 @@
 import  mongoose  from "mongoose";
 import validator from "validator";
 
+// This regex checks the validity of the phoneNumber field. 
+// It tests true for empty or 10-digit strings.
+export const validPhoneNumberRegex = /^$|^\d{10}$/;
+
 const contactSchema = new mongoose.Schema({
   name: {
     type: String,
@@ -15,22 +19,21 @@ const contactSchema = new mongoose.Schema({
   email: {
     type: String,
     trim: true,
-    unique: true,
     validate: {
-      validator: (value) => validator.isEmail(value),
+      validator: (value) => value === '' || validator.isEmail(value),
       message: (props) => `${props.value} is not a valid email`
     }
   },
   phoneNumber: {
     type: String,
-    minLength: [10, 'phoneNumber must be ten digits long'],
-    maxLength: [10, 'phoneNumber must be ten digits long'],
-    validate: {
-      validator: (value) => validator.isNumeric(value, { no_symbols: true }),
-      message: ({ value }) => `${value} is not a valid phone number`
-    }
+    trim: true,
+    match: [validPhoneNumberRegex, 'Invalid phone number: it must be a string of 10 digits'],
   },
-  company: String,
+  company: {
+    type: String,
+    trim: true,
+  }
+  
 });
 
 export const Contact = mongoose.model('Contact', contactSchema);
